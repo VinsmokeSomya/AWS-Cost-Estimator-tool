@@ -3,214 +3,95 @@ import os
 import logging
 from typing import Dict, Any, Optional, Iterator
 import ijson  # For streaming JSON parsing
+import boto3
+from datetime import datetime
+from aws_pricing_api import AWSPricingAPI
 
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
 class PricingDataLoader:
-    def __init__(self, pricing_dir: str = "aws_pricing_data", region: str = "ap-south-1"):
-        """Initialize the pricing data loader."""
-        self.pricing_dir = pricing_dir
+    def __init__(self, region: str = 'ap-south-1'):
         self.region = region
-        # Initialize empty cache structure without any default values
+        self.pricing_api = AWSPricingAPI(region)
         self.pricing_cache = {
-            'ec2': {},      # instance_type -> price
-            'rds': {},      # instance_type -> price
+            'ec2': {},
+            'rds': {},
             'lambda': {
                 'request_price': 0.0,
                 'compute_price': 0.0
             },
             's3': {
-                'storage': 0.0,
-                'requests': {
-                    'PUT': 0.0,
-                    'GET': 0.0
-                }
+                'storage_price': 0.0,
+                'request_price': 0.0
             },
             'dynamodb': {
-                'storage': 0.0,
-                'rcu': 0.0,
-                'wcu': 0.0
+                'storage_price': 0.0,
+                'read_capacity': 0.0,
+                'write_capacity': 0.0
             },
             'route53': {
                 'hosted_zone': 0.0,
-                'queries': 0.0
+                'query_price': 0.0
             },
             'cloudfront': {
                 'data_transfer': 0.0,
-                'requests': 0.0
+                'request_price': 0.0
             },
             'sns': {
-                'requests': 0.0
+                'notification_price': 0.0
             },
-            'elasticache': {},  # instance_type -> price
+            'elasticache': {},
             'config': {
-                'config_items': 0.0,
-                'rule_evaluations': 0.0
+                'config_item': 0.0,
+                'rule_evaluation': 0.0
             }
         }
         self._load_pricing_data()
 
-    def _stream_json_file(self, file_path: str):
-        """Stream a JSON file and yield product-price pairs."""
-        try:
-            with open(file_path, 'r') as f:
-                data = json.load(f)
-                
-                # Process each product
-                for product_id, product in data.get('products', {}).items():
-                    # Get the corresponding pricing terms
-                    terms = data.get('terms', {}).get('OnDemand', {}).get(product_id, {})
-                    
-                    for term_id, term_info in terms.items():
-                        # Get price dimensions for this term
-                        price_dimensions = term_info.get('priceDimensions', {})
-                        
-                        for dimension_id, dimension in price_dimensions.items():
-                            price_per_unit = dimension.get('pricePerUnit', {}).get('USD', '0')
-                            try:
-                                price = float(price_per_unit)
-                            except (ValueError, TypeError):
-                                price = 0.0
-                                
-                            if price > 0:
-                                product_info = {
-                                    'sku': product.get('sku'),
-                                    'attributes': product.get('attributes', {}),
-                                    'price': price,
-                                    'description': dimension.get('description', ''),
-                                    'unit': dimension.get('unit', '')
-                                }
-                                yield product_info
-                                
-        except Exception as e:
-            logging.error(f"Error processing {file_path}: {str(e)}")
-            yield None
-
     def _load_pricing_data(self):
-        """Load pricing data from JSON files."""
-        logging.basicConfig(level=logging.INFO)
-        logging.info("Loading AWS pricing data...")
-        
-        # Load EC2 pricing
-        ec2_file = os.path.join(self.pricing_dir, self.region, 'AmazonEC2_pricing.json')
-        logging.info(f"Looking for EC2 pricing file at: {ec2_file}")
-        if os.path.exists(ec2_file):
-            for product in self._stream_json_file(ec2_file):
-                if product and 'attributes' in product:
-                    instance_type = product['attributes'].get('instanceType')
-                    if instance_type:
-                        self.pricing_cache['ec2'][instance_type] = product['price']
-                        logging.info(f"Found EC2 price for {instance_type}: ${product['price']}/hour")
-            logging.info(f"Loaded {len(self.pricing_cache['ec2'])} EC2 instance types")
-        else:
-            logging.warning(f"EC2 pricing file not found at {ec2_file}")
-        
-        # Load RDS pricing
-        rds_file = os.path.join(self.pricing_dir, self.region, 'AmazonRDS_pricing.json')
-        logging.info(f"Looking for RDS pricing file at: {rds_file}")
-        if os.path.exists(rds_file):
-            for product in self._stream_json_file(rds_file):
-                if product and 'attributes' in product:
-                    instance_type = product['attributes'].get('instanceType')
-                    if instance_type:
-                        self.pricing_cache['rds'][instance_type] = product['price']
-                        logging.info(f"Found RDS price for {instance_type}: ${product['price']}/hour")
-            logging.info(f"Loaded {len(self.pricing_cache['rds'])} RDS instance types")
-        else:
-            logging.warning(f"RDS pricing file not found at {rds_file}")
-        
-        # Load Lambda pricing
-        lambda_file = os.path.join(self.pricing_dir, self.region, 'AWSLambda_pricing.json')
-        logging.info(f"Looking for Lambda pricing file at: {lambda_file}")
-        if os.path.exists(lambda_file):
-            for product in self._stream_json_file(lambda_file):
-                if product and 'attributes' in product:
-                    if 'Request' in product['description']:
-                        self.pricing_cache['lambda']['request_price'] = product['price']
-                        logging.info(f"Found Lambda request price: ${product['price']}/million requests")
-                    elif 'GB-Second' in product['description']:
-                        self.pricing_cache['lambda']['compute_price'] = product['price']
-                        logging.info(f"Found Lambda compute price: ${product['price']}/GB-second")
-            logging.info(f"Loaded Lambda pricing: {self.pricing_cache['lambda']}")
-        else:
-            logging.warning(f"Lambda pricing file not found at {lambda_file}")
-        
-        # Load S3 pricing
-        s3_file = os.path.join(self.pricing_dir, self.region, 'AmazonS3_pricing.json')
-        logging.info(f"Looking for S3 pricing file at: {s3_file}")
-        if os.path.exists(s3_file):
-            for product in self._stream_json_file(s3_file):
-                if product and 'attributes' in product:
-                    if 'Storage' in product['description']:
-                        self.pricing_cache['s3']['storage'] = product['price']
-                        logging.info(f"Found S3 storage price: ${product['price']}/GB-month")
-                    elif 'PUT' in product['description']:
-                        self.pricing_cache['s3']['requests']['PUT'] = product['price']
-                        logging.info(f"Found S3 PUT request price: ${product['price']}/1000 requests")
-                    elif 'GET' in product['description']:
-                        self.pricing_cache['s3']['requests']['GET'] = product['price']
-                        logging.info(f"Found S3 GET request price: ${product['price']}/1000 requests")
-            logging.info(f"Loaded S3 pricing: {self.pricing_cache['s3']}")
-        else:
-            logging.warning(f"S3 pricing file not found at {s3_file}")
-        
-        # Load DynamoDB pricing
-        dynamodb_file = os.path.join(self.pricing_dir, self.region, 'AmazonDynamoDB_pricing.json')
-        logging.info(f"Looking for DynamoDB pricing file at: {dynamodb_file}")
-        if os.path.exists(dynamodb_file):
-            for product in self._stream_json_file(dynamodb_file):
-                if product and 'attributes' in product:
-                    if 'Storage' in product['description']:
-                        self.pricing_cache['dynamodb']['storage'] = product['price']
-                        logging.info(f"Found DynamoDB storage price: ${product['price']}/GB-month")
-                    elif 'RCU' in product['description']:
-                        self.pricing_cache['dynamodb']['rcu'] = product['price']
-                        logging.info(f"Found DynamoDB RCU price: ${product['price']}/RCU-hour")
-                    elif 'WCU' in product['description']:
-                        self.pricing_cache['dynamodb']['wcu'] = product['price']
-                        logging.info(f"Found DynamoDB WCU price: ${product['price']}/WCU-hour")
-            logging.info(f"Loaded DynamoDB pricing: {self.pricing_cache['dynamodb']}")
-        else:
-            logging.warning(f"DynamoDB pricing file not found at {dynamodb_file}")
-        
-        # Load SNS pricing
-        sns_file = os.path.join(self.pricing_dir, self.region, 'AmazonSNS_pricing.json')
-        logging.info(f"Looking for SNS pricing file at: {sns_file}")
-        if os.path.exists(sns_file):
-            for product in self._stream_json_file(sns_file):
-                if product and 'attributes' in product:
-                    if 'API Requests' in product['description']:
-                        self.pricing_cache['sns']['requests'] = product['price']
-                        logging.info(f"Found SNS request price: ${product['price']}/million requests")
-            logging.info(f"Loaded SNS pricing: {self.pricing_cache['sns']}")
-        else:
-            logging.warning(f"SNS pricing file not found at {sns_file}")
-        
-        # Load ElastiCache pricing
-        elasticache_file = os.path.join(self.pricing_dir, self.region, 'AmazonElastiCache_pricing.json')
-        logging.info(f"Looking for ElastiCache pricing file at: {elasticache_file}")
-        if os.path.exists(elasticache_file):
-            for product in self._stream_json_file(elasticache_file):
-                if product and 'attributes' in product:
-                    instance_type = product['attributes'].get('instanceType')
-                    if instance_type:
-                        self.pricing_cache['elasticache'][instance_type] = product['price']
-                        logging.info(f"Found ElastiCache price for {instance_type}: ${product['price']}/hour")
-            logging.info(f"Loaded {len(self.pricing_cache['elasticache'])} ElastiCache instance types")
-        else:
-            logging.warning(f"ElastiCache pricing file not found at {elasticache_file}")
-        
-        # Log final summary
-        logging.info("\nPricing data summary:")
-        for service, data in self.pricing_cache.items():
-            if isinstance(data, dict):
-                if service in ['ec2', 'rds', 'elasticache']:
-                    logging.info(f"{service}: {len(data)} instance types loaded")
-                else:
-                    logging.info(f"{service}: {data}")
-        
-        logging.info("\nFinished loading AWS pricing data")
+        """Load pricing data from AWS Pricing API"""
+        try:
+            # Load EC2 prices
+            self.pricing_cache['ec2']['t3.medium'] = self.pricing_api.get_ec2_price('t3.medium')
+            
+            # Load RDS prices
+            self.pricing_cache['rds']['db.t3.medium'] = self.pricing_api.get_rds_price('db.t3.medium')
+            
+            # Load Lambda prices
+            lambda_prices = self.pricing_api.get_lambda_price()
+            self.pricing_cache['lambda'].update(lambda_prices)
+            
+            # Load S3 prices
+            s3_prices = self.pricing_api.get_s3_price()
+            self.pricing_cache['s3'].update(s3_prices)
+            
+            # Load DynamoDB prices
+            dynamodb_prices = self.pricing_api.get_dynamodb_price()
+            self.pricing_cache['dynamodb'].update(dynamodb_prices)
+            
+            # Load Route53 prices
+            route53_prices = self.pricing_api.get_route53_price()
+            self.pricing_cache['route53'].update(route53_prices)
+            
+            # Load CloudFront prices
+            cloudfront_prices = self.pricing_api.get_cloudfront_price()
+            self.pricing_cache['cloudfront'].update(cloudfront_prices)
+            
+            # Load SNS prices
+            sns_prices = self.pricing_api.get_sns_price()
+            self.pricing_cache['sns'].update(sns_prices)
+            
+            # Load ElastiCache prices
+            self.pricing_cache['elasticache']['cache.t3.small'] = self.pricing_api.get_elasticache_price('cache.t3.small')
+            
+            # Load AWS Config prices
+            config_prices = self.pricing_api.get_config_price()
+            self.pricing_cache['config'].update(config_prices)
+            
+        except Exception as e:
+            logging.error(f"Error loading pricing data: {str(e)}")
+            raise
 
     def get_ec2_instance_price(self, instance_type: str) -> float:
         """Get hourly price for EC2 instance type."""
@@ -250,27 +131,23 @@ class PricingDataLoader:
 
     def get_s3_storage_price(self) -> float:
         """Get S3 storage price per GB-month."""
-        return self.pricing_cache['s3']['storage']
+        return self.pricing_cache['s3']['storage_price']
 
     def get_s3_put_price(self) -> float:
         """Get S3 PUT request price per 1000 requests."""
-        return self.pricing_cache['s3']['requests']['PUT']
-
-    def get_s3_get_price(self) -> float:
-        """Get S3 GET request price per 1000 requests."""
-        return self.pricing_cache['s3']['requests']['GET']
+        return self.pricing_cache['s3']['request_price']
 
     def get_dynamodb_storage_price(self) -> float:
         """Get DynamoDB storage price per GB-month."""
-        return self.pricing_cache['dynamodb']['storage']
+        return self.pricing_cache['dynamodb']['storage_price']
 
     def get_dynamodb_rcu_price(self) -> float:
         """Get DynamoDB read capacity unit price per RCU-hour."""
-        return self.pricing_cache['dynamodb']['rcu']
+        return self.pricing_cache['dynamodb']['read_capacity']
 
     def get_dynamodb_wcu_price(self) -> float:
         """Get DynamoDB write capacity unit price per WCU-hour."""
-        return self.pricing_cache['dynamodb']['wcu']
+        return self.pricing_cache['dynamodb']['write_capacity']
 
     def get_cloudfront_transfer_price(self) -> float:
         """Get CloudFront data transfer price per GB."""
@@ -278,11 +155,11 @@ class PricingDataLoader:
 
     def get_cloudfront_request_price(self) -> float:
         """Get CloudFront request price per 10,000 requests."""
-        return self.pricing_cache['cloudfront']['requests']
+        return self.pricing_cache['cloudfront']['request_price']
 
     def get_sns_price(self) -> float:
         """Get SNS price per million requests."""
-        return self.pricing_cache['sns']['requests']
+        return self.pricing_cache['sns']['notification_price']
 
     def get_emr_service_charge(self) -> float:
         """Get EMR service charge percentage."""
@@ -321,7 +198,7 @@ class CostEstimator:
     def __init__(self, pricing_dir: str = 'aws_pricing_data', region: str = 'ap-south-1'):
         """Initialize the cost estimator with pricing data directory and region."""
         self.region = region
-        self.pricing = PricingDataLoader(pricing_dir=pricing_dir, region=region)
+        self.pricing = PricingDataLoader(region=region)
 
     def calculate_rds_cost(self, instance_type: str) -> float:
         """Calculate monthly cost for RDS instance."""
@@ -345,7 +222,7 @@ class CostEstimator:
         try:
             prices = self.pricing.get_route53_prices()
             hosted_zone_cost = prices['hosted_zone']
-            queries_cost = prices['queries'] * 1000000  # Assuming 1M queries per month
+            queries_cost = prices['query_price'] * 1000000  # Assuming 1M queries per month
             total_cost = hosted_zone_cost + queries_cost
             logging.info(f"Route53 cost calculation: hosted_zone_cost=${hosted_zone_cost:.2f}, queries_cost=${queries_cost:.2f}")
             return total_cost
@@ -476,7 +353,7 @@ class CostEstimator:
             data_transfer_gb = 100  # Assuming 100GB transfer per month
             requests = 1000000  # Assuming 1M requests per month
             data_transfer_cost = prices['data_transfer'] * data_transfer_gb
-            requests_cost = prices['requests'] * (requests / 10000)
+            requests_cost = prices['request_price'] * (requests / 10000)
             total_cost = data_transfer_cost + requests_cost
             logging.info(f"CloudFront cost calculation: data_transfer_cost=${data_transfer_cost:.2f}, requests_cost=${requests_cost:.2f}")
             return total_cost
@@ -523,7 +400,7 @@ class CostEstimator:
             # Get pricing
             storage_price = self.pricing.get_s3_storage_price()
             put_price = self.pricing.get_s3_put_price()
-            get_price = self.pricing.get_s3_get_price()
+            get_price = self.pricing.get_s3_put_price()
             
             # Calculate monthly costs
             storage_cost = storage_gb * storage_price  # Price is per GB-month
@@ -596,8 +473,8 @@ class CostEstimator:
             prices = self.pricing.get_config_prices()
             config_items = 100  # Assuming 100 config items
             rule_evaluations = 1000  # Assuming 1000 rule evaluations per month
-            config_items_cost = prices['config_items'] * config_items
-            rule_evaluations_cost = prices['rule_evaluations'] * rule_evaluations
+            config_items_cost = prices['config_item'] * config_items
+            rule_evaluations_cost = prices['rule_evaluation'] * rule_evaluations
             total_cost = config_items_cost + rule_evaluations_cost
             logging.info(f"AWS Config cost calculation: config_items_cost=${config_items_cost:.2f}, rule_evaluations_cost=${rule_evaluations_cost:.2f}")
             return total_cost

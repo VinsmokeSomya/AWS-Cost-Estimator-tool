@@ -1,0 +1,61 @@
+{
+    "nodes": [
+        {
+            "id": "vpc-1",
+            "label": "VPC",
+            "type": "AmazonVPC"
+        },
+        {
+            "id": "ec2-1",
+            "label": "Application Server",
+            "type": "AmazonEC2",
+            "InstanceType": "t3.medium"
+        },
+        {
+            "id": "rds-1",
+            "label": "Database",
+            "type": "AmazonRDS",
+            "DBInstanceClass": "db.t3.medium"
+        },
+        {
+            "id": "s3-1",
+            "label": "Storage",
+            "type": "AmazonS3"
+        },
+        {
+            "id": "lambda-1",
+            "label": "Serverless Function",
+            "type": "AWSLambda",
+            "Memory": "512MB",
+            "Timeout": "30s"
+        },
+        {
+            "id": "elasticache-1",
+            "label": "Cache",
+            "type": "AmazonElastiCache",
+            "InstanceType": "cache.t3.small"
+        }
+    ],
+    "edges": [
+        {
+            "from": "vpc-1",
+            "to": "ec2-1"
+        },
+        {
+            "from": "vpc-1",
+            "to": "rds-1"
+        },
+        {
+            "from": "vpc-1",
+            "to": "elasticache-1"
+        },
+        {
+            "from": "ec2-1",
+            "to": "s3-1"
+        },
+        {
+            "from": "ec2-1",
+            "to": "lambda-1"
+        }
+    ]
+} 
