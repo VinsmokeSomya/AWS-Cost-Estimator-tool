@@ -1,0 +1,178 @@
+{
+    "architecture_name": "Multi_Tier_AWS_Architecture",
+    "region": "ap-south-1",
+    "generation_date": "2025-03-19T20:54:47.747385",
+    "total_monthly_cost": 32.799,
+    "services": {
+        "EC2": {
+            "instance_type": "t3.medium",
+            "hourly_cost": 0.0448,
+            "daily_cost": 1.0752,
+            "monthly_cost": 32.256,
+            "specifications": {
+                "vCPU": 2,
+                "memory": "4.0 GiB",
+                "network_bandwidth": "Up to 5 Gigabit",
+                "storage": "EBS only",
+                "sku": "2PHBQBNB7HAZNS4M"
+            }
+        },
+        "RDS": {
+            "instance_type": "db.t3.medium",
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "vCPU": 2,
+                "memory": "4.0 GiB",
+                "storage": "20 GB",
+                "engine": "SQL Server",
+                "sku": "2A9V576VUQTHYGT5"
+            }
+        },
+        "S3": {
+            "storage_class": "Standard",
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "storage_price_per_gb": "$0.0240",
+                "request_price_per_1000": "$24.0000",
+                "storage_class": "Standard",
+                "sku": "USGUTP2JY23N9GH2"
+            }
+        },
+        "ElastiCache": {
+            "instance_type": "cache.t3.small",
+            "hourly_cost": 0.0001,
+            "daily_cost": 0.0014,
+            "monthly_cost": 0.043,
+            "specifications": {
+                "vCPU": 2,
+                "memory": "1.37 GiB",
+                "network_bandwidth": "Up to 5 Gigabit",
+                "engine": "Redis",
+                "sku": "5FVXACW2H7JEJEBT"
+            }
+        },
+        "Route53": {
+            "hourly_cost": 0.0007,
+            "daily_cost": 0.0167,
+            "monthly_cost": 0.5,
+            "specifications": {
+                "hosted_zone": "$0.50 per zone",
+                "queries": "$0.0002 per query",
+                "sku": "KVPGEJE88UW8S779"
+            }
+        },
+        "CloudFront": {
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "data_transfer": "Unknown",
+                "requests": "Unknown",
+                "edge_locations": "225+ globally",
+                "ssl_certificates": "Free with CloudFront",
+                "cache_behavior": "Customizable",
+                "origin_types": [
+                    "S3",
+                    "EC2",
+                    "ELB",
+                    "Custom Origin"
+                ],
+                "features": [
+                    "DDoS Protection",
+                    "WAF Integration",
+                    "Field-Level Encryption"
+                ],
+                "sku": "Unknown"
+            }
+        },
+        "Lambda": {
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "memory": "128 MB to 10,240 MB",
+                "timeout": "Up to 15 minutes",
+                "runtime": "Multiple supported",
+                "compute_price": "$0.000017 per GB-second",
+                "sku": "3BYZH4NKJN8TJUQ6"
+            }
+        },
+        "SNS": {
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "message_price": "$0.000000 per message",
+                "delivery_protocols": [
+                    "HTTP/HTTPS",
+                    "Email",
+                    "SMS",
+                    "Mobile Push"
+                ],
+                "sku": "QDX8G2WMY9NPXXPG"
+            }
+        },
+        "AWS Config": {
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "config_item_price": "Unknown",
+                "rule_evaluation_price": "Unknown",
+                "monitored_resources": [
+                    "EC2",
+                    "S3",
+                    "RDS",
+                    "IAM",
+                    "VPC",
+                    "Lambda",
+                    "CloudFront",
+                    "DynamoDB",
+                    "ElastiCache",
+                    "SNS",
+                    "CloudWatch"
+                ],
+                "features": [
+                    "Multi-Account Support",
+                    "Conformance Packs",
+                    "Organization Rules",
+                    "Custom Rules"
+                ],
+                "compliance_frameworks": [
+                    "CIS AWS Foundations",
+                    "PCI DSS",
+                    "HIPAA",
+                    "SOC 2"
+                ],
+                "sku": "Unknown"
+            }
+        },
+        "VPC": {
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "features": [
+                    "NAT Gateway",
+                    "Internet Gateway",
+                    "VPC Endpoints"
+                ],
+                "network_features": [
+                    "VPC Peering",
+                    "Transit Gateway",
+                    "Direct Connect"
+                ],
+                "security_features": [
+                    "Security Groups",
+                    "Network ACLs",
+                    "Flow Logs"
+                ],
+                "sku": "VPC-Base"
+            }
+        }
+    }
+}

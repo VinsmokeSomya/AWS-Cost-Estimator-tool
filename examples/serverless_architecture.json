@@ -1,0 +1,124 @@
+{
+    "title": "Serverless_AWS_Architecture",
+    "nodes": [
+        {
+            "id": "vpc",
+            "type": "AmazonVPC",
+            "label": "Virtual Private Cloud",
+            "group": "Network Layer",
+            "CIDR": "172.16.0.0/16",
+            "Subnets": "Public & Private",
+            "MonthlyCost": ""
+        },
+        {
+            "id": "route53",
+            "type": "AmazonRoute53",
+            "label": "DNS Management",
+            "group": "Network Layer",
+            "Domain": "serverless-app.com",
+            "MonthlyCost": ""
+        },
+        {
+            "id": "cloudFront",
+            "type": "AmazonCloudFront",
+            "label": "CDN",
+            "group": "Delivery Layer",
+            "CacheSize": "100GB",
+            "RequestCount": "1000000",
+            "MonthlyCost": ""
+        },
+        {
+            "id": "s3bucket",
+            "type": "AmazonS3",
+            "label": "Static Website Hosting",
+            "group": "Storage Layer",
+            "BucketName": "static-website-files",
+            "Size": "50GB",
+            "RequestCount": "500000",
+            "MonthlyCost": ""
+        },
+        {
+            "id": "dynamoDB",
+            "type": "AmazonDynamoDB",
+            "label": "NoSQL Database",
+            "group": "Database Layer",
+            "Throughput": "10 Read / 10 Write",
+            "Storage": "100GB",
+            "MonthlyCost": ""
+        },
+        {
+            "id": "lambda",
+            "type": "AWSLambda",
+            "label": "API Functions",
+            "group": "Compute Layer",
+            "Runtime": "Node.js",
+            "Memory": "1024MB",
+            "Timeout": "30s",
+            "MonthlyCost": ""
+        },
+        {
+            "id": "sns",
+            "type": "AmazonSNS",
+            "label": "Notification Service",
+            "group": "Messaging Layer",
+            "TopicName": "user-notifications",
+            "Subscribers": "10000",
+            "MonthlyCost": ""
+        },
+        {
+            "id": "elasticache",
+            "type": "AmazonElastiCache",
+            "label": "Caching Service",
+            "group": "Cache Layer",
+            "Engine": "Redis",
+            "InstanceType": "cache.t3.medium",
+            "MonthlyCost": ""
+        },
+        {
+            "id": "config",
+            "type": "AWSConfig",
+            "label": "Configuration Management",
+            "group": "Security & Compliance",
+            "Rules": "Monitor S3, DynamoDB, Lambda",
+            "MonthlyCost": ""
+        }
+    ],
+    "edges": [
+        {
+            "from": "route53",
+            "to": "cloudFront"
+        },
+        {
+            "from": "cloudFront",
+            "to": "s3bucket"
+        },
+        {
+            "from": "cloudFront",
+            "to": "lambda"
+        },
+        {
+            "from": "lambda",
+            "to": "dynamoDB"
+        },
+        {
+            "from": "lambda",
+            "to": "elasticache"
+        },
+        {
+            "from": "lambda",
+            "to": "sns"
+        },
+        {
+            "from": "config",
+            "to": "s3bucket"
+        },
+        {
+            "from": "config",
+            "to": "dynamoDB"
+        },
+        {
+            "from": "config",
+            "to": "lambda"
+        }
+    ]
+} 
