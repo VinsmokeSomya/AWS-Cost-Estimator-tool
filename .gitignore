@@ -40,8 +40,8 @@ venv.bak/
 .settings/
 
 # AWS Pricing Data and Logs
-aws_pricing_data/
-logs/
+aws_pricing_data/*.json
+logs/*.log
 *.log
 failed_downloads.json
 
