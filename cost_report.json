@@ -1,0 +1,212 @@
+{
+    "architecture_name": "AWS_Architecture",
+    "region": "ap-south-1",
+    "generation_date": "2025-03-20T01:43:33.123187",
+    "total_hourly_cost": 0.10030000000000001,
+    "total_daily_cost": 2.4072000000000005,
+    "total_monthly_cost": 72.216,
+    "services": {
+        "AmazonEC2": {
+            "instance_type": "t2.micro",
+            "hourly_cost": 0.0124,
+            "daily_cost": 0.2976,
+            "monthly_cost": 8.927999999999999,
+            "specifications": {
+                "enhancedNetworkingSupported": "No",
+                "intelTurboAvailable": "Yes",
+                "memory": "1 GiB",
+                "vcpu": "1",
+                "classicnetworkingsupport": "false",
+                "capacitystatus": "Used",
+                "locationType": "AWS Region",
+                "storage": "EBS only",
+                "instanceFamily": "General purpose",
+                "operatingSystem": "Linux",
+                "intelAvx2Available": "No",
+                "regionCode": "ap-south-1",
+                "physicalProcessor": "Intel Xeon Family",
+                "clockSpeed": "Up to 3.3 GHz",
+                "ecu": "NA",
+                "networkPerformance": "Low to Moderate",
+                "servicename": "Amazon Elastic Compute Cloud",
+                "gpuMemory": "NA",
+                "vpcnetworkingsupport": "true",
+                "instanceType": "t2.micro",
+                "tenancy": "Shared",
+                "usagetype": "APS3-BoxUsage:t2.micro",
+                "normalizationSizeFactor": "0.5",
+                "intelAvxAvailable": "Yes",
+                "processorFeatures": "Intel AVX; Intel Turbo",
+                "servicecode": "AmazonEC2",
+                "licenseModel": "No License required",
+                "currentGeneration": "Yes",
+                "preInstalledSw": "NA",
+                "location": "Asia Pacific (Mumbai)",
+                "processorArchitecture": "32-bit or 64-bit",
+                "marketoption": "OnDemand",
+                "operation": "RunInstances",
+                "availabilityzone": "NA"
+            }
+        },
+        "AmazonRDS": {
+            "instance_type": "db.t3.small",
+            "hourly_cost": 0.049,
+            "daily_cost": 1.1760000000000002,
+            "monthly_cost": 35.28,
+            "specifications": {
+                "engineCode": "2",
+                "instanceTypeFamily": "T3",
+                "memory": "2 GiB",
+                "vcpu": "2",
+                "instanceType": "db.t3.small",
+                "usagetype": "APS3-InstanceUsage:db.t3.small",
+                "locationType": "AWS Region",
+                "storage": "EBS Only",
+                "normalizationSizeFactor": "1",
+                "instanceFamily": "General purpose",
+                "databaseEngine": "MySQL",
+                "regionCode": "ap-south-1",
+                "servicecode": "AmazonRDS",
+                "physicalProcessor": "Intel Skylake E5 2686 v5 (2.5 GHz)",
+                "licenseModel": "No license required",
+                "currentGeneration": "Yes",
+                "networkPerformance": "Low to Moderate",
+                "deploymentOption": "Single-AZ",
+                "location": "Asia Pacific (Mumbai)",
+                "servicename": "Amazon Relational Database Service",
+                "processorArchitecture": "64-bit",
+                "operation": "CreateDBInstance:0002"
+            }
+        },
+        "AmazonAPIGateway": {
+            "usage_type": "API calls and data transfer",
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "pricing_components": [
+                    "API Calls (per 1M calls)",
+                    "Data Transfer (per GB)",
+                    "Cache (per GB per hour)"
+                ]
+            }
+        },
+        "AmazonS3": {
+            "usage_type": "Storage, requests, and data transfer",
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "pricing_components": [
+                    "Storage (per GB per month)",
+                    "Data Transfer (per GB)",
+                    "Requests (per 1000 requests)",
+                    "Lifecycle Transitions"
+                ]
+            }
+        },
+        "AmazonVPC": {
+            "instance_type": "N/A",
+            "hourly_cost": 0.013,
+            "daily_cost": 0.312,
+            "monthly_cost": 9.36,
+            "specifications": {
+                "regionCode": "ap-south-1",
+                "endpointType": "Gateway Load Balancer Endpoint",
+                "servicecode": "AmazonVPC",
+                "groupDescription": "Hourly charge for AWS Gateway Load Balancer VPC Endpoint",
+                "usagetype": "APS3-VpcEndpoint-GWLBE-Hours",
+                "locationType": "AWS Region",
+                "location": "Asia Pacific (Mumbai)",
+                "servicename": "Amazon Virtual Private Cloud",
+                "operation": "VpcEndpoint",
+                "group": "VPCE:VpcEndpoint"
+            }
+        },
+        "AWSLambda": {
+            "usage_type": "Compute time and requests",
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "pricing_components": [
+                    "Compute (per 100ms)",
+                    "Requests (per 1M requests)",
+                    "Data Transfer (per GB)"
+                ]
+            }
+        },
+        "AmazonDynamoDB": {
+            "usage_type": "Read/write capacity and storage",
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "pricing_components": [
+                    "Read Capacity (per RCU)",
+                    "Write Capacity (per WCU)",
+                    "Storage (per GB per month)",
+                    "Data Transfer (per GB)"
+                ]
+            }
+        },
+        "AmazonSNS": {
+            "usage_type": "Message delivery and data transfer",
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "pricing_components": [
+                    "Message Delivery (per 1M messages)",
+                    "Data Transfer (per GB)",
+                    "HTTP/HTTPS Delivery"
+                ]
+            }
+        },
+        "AWSELB": {
+            "instance_type": "N/A",
+            "hourly_cost": 0.0239,
+            "daily_cost": 0.5736,
+            "monthly_cost": 17.208,
+            "specifications": {
+                "regionCode": "ap-south-1",
+                "servicecode": "AWSELB",
+                "groupDescription": "LoadBalancer hourly usage by Application Load Balancer on Outposts",
+                "usagetype": "APS3-Outposts-LoadBalancerUsage",
+                "locationType": "AWS Outposts",
+                "location": "Asia Pacific (Mumbai)",
+                "servicename": "Elastic Load Balancing",
+                "operation": "LoadBalancing:Application",
+                "group": "ELB:Balancing"
+            }
+        },
+        "AmazonSQS": {
+            "usage_type": "Message requests and data transfer",
+            "hourly_cost": 0.0,
+            "daily_cost": 0.0,
+            "monthly_cost": 0.0,
+            "specifications": {
+                "pricing_components": [
+                    "Requests (per 1M requests)",
+                    "Data Transfer (per GB)"
+                ]
+            }
+        },
+        "AWSIAMAccessAnalyzer": {
+            "instance_type": "N/A",
+            "hourly_cost": 0.002,
+            "daily_cost": 0.048,
+            "monthly_cost": 1.44,
+            "specifications": {
+                "checkType": "Automated Reasoning Checks",
+                "regionCode": "ap-south-1",
+                "servicecode": "AWSIAMAccessAnalyzer",
+                "usagetype": "APS3-CustomCheck-API-Requests",
+                "locationType": "AWS Region",
+                "location": "Asia Pacific (Mumbai)",
+                "servicename": "AWS Identity and Access Management Access Analyzer",
+                "operation": "AccessCheck"
+            }
+        }
+    }
+}

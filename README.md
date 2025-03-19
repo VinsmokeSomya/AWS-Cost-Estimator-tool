@@ -1,24 +1,19 @@
 # AWS Architecture Cost Estimator
 
-A flexible tool for estimating AWS architecture costs across various services. This tool can handle different JSON formats and provides detailed cost breakdowns for AWS architectures.
+A simple and efficient tool for estimating AWS architecture costs. This tool calculates costs for various AWS services using the AWS Pricing API.
 
 ## Features
 
-- **Flexible Architecture Parsing**: Handles various JSON formats for AWS architecture definitions
-- **Multiple Service Support**: Estimates costs for:
-  - AWS Lambda Functions
-  - Amazon DynamoDB
-  - Amazon S3
-  - Amazon API Gateway
-  - Amazon SNS
-  - AWS IAM Access Analyzer
-  - Amazon EC2
-  - Amazon RDS
-  - Amazon CloudFront
-  - Amazon ElastiCache
-- **Detailed Cost Breakdown**: Provides itemized costs per service and total monthly cost
-- **Real-time AWS Pricing**: Can fetch and use current AWS pricing data
-- **JSON Output**: Saves detailed cost estimates in JSON format
+- **Simple Architecture Format**: Uses a straightforward JSON format for defining AWS architectures
+- **Service Support**: Estimates costs for:
+  - Amazon EC2 (Elastic Compute Cloud)
+  - Amazon RDS (Relational Database Service)
+  - Amazon S3 (Simple Storage Service)
+  - AWS Lambda
+  - Other usage-based services
+- **Detailed Cost Breakdown**: Provides itemized costs per service and total costs (hourly and monthly)
+- **Real-time AWS Pricing**: Uses AWS Pricing API for accurate, current pricing data
+- **Usage-Based Service Support**: Handles services with usage-based pricing models
 
 ## Installation
 
@@ -33,136 +28,122 @@ cd aws-architecture-cost-estimator
 pip install -r requirements.txt
 ```
 
+3. Set up your AWS credentials in a `.env` file:
+```
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+AWS_REGION=ap-south-1
+```
+
 ## Usage
 
 ### Basic Usage
 
 ```bash
-python flexible_cost_estimator.py your_architecture.json
+python main.py
 ```
 
 ### Architecture JSON Format
 
-The tool accepts various JSON formats. Here are some examples:
+The tool accepts a simple JSON format for architecture definition:
 
-1. Node-based format:
 ```json
 {
   "nodes": [
     {
-      "id": "lambda1",
-      "type": "Lambda",
-      "Memory": 1024,
-      "CostBreakdown": {
-        "InvocationCost": 1000000,
-        "ExecutionTimeCost": 1000
-      }
+      "type": "AmazonEC2",
+      "instance_type": "c6a.2xlarge"
     },
     {
-      "id": "db1",
-      "type": "DynamoDB",
-      "Storage": 100,
-      "Throughput": 25
+      "type": "AmazonRDS",
+      "instance_type": "db.t3.micro"
+    },
+    {
+      "type": "AmazonS3"
+    },
+    {
+      "type": "AWSLambda"
     }
   ]
 }
 ```
 
-2. Service-based format:
-```json
-{
-  "services": {
-    "WebApp": {
-      "type": "EC2",
-      "instance_type": "t3.micro",
-      "hours_per_month": 730
-    },
-    "Database": {
-      "type": "RDS",
-      "instance_type": "db.t3.micro",
-      "storage_gb": 20
-    }
-  }
-}
-```
-
-### Example Architectures
-
-The repository includes two example architectures:
-- `ai_chatbot_architecture.json`: AI Chatbot using Lambda, DynamoDB, API Gateway, etc.
-- `ecommerce_architecture.json`: E-commerce platform using EC2, RDS, S3, etc.
-
 ## Project Structure
 
 ```
 .
-├── flexible_cost_estimator.py   # Main script for cost estimation
-├── cost_estimator.py           # Core cost calculation logic
-├── aws_price_downloader.py     # AWS pricing data downloader
-├── delta_downloader.py         # Delta pricing data handler
-├── requirements.txt            # Project dependencies
-├── aws_pricing_data/          # Directory for AWS pricing data
-├── logs/                      # Log files directory
-└── examples/
-    ├── ai_chatbot_architecture.json
-    └── ecommerce_architecture.json
+├── aws_pricing_api.py     # AWS Pricing API interaction
+├── cost_estimator.py      # Core cost estimation logic
+├── main.py               # Main entry point
+├── test_architecture.json # Sample architecture
+├── requirements.txt       # Project dependencies
+├── .env                  # Environment configuration
+└── README.md             # Documentation
 ```
 
 ## Core Components
 
-### flexible_cost_estimator.py
-- Main entry point for cost estimation
-- Handles various JSON formats
-- Transforms architecture definitions into standardized format
-- Provides detailed cost breakdowns
+### aws_pricing_api.py
+- Handles interaction with AWS Pricing API
+- Retrieves and processes pricing data
+- Supports region-specific pricing
 
 ### cost_estimator.py
 - Core cost calculation logic
-- Service-specific pricing calculations
-- Handles AWS pricing data
+- Handles both fixed-cost and usage-based services
+- Generates detailed cost reports
 
-## AWS Pricing Data
-
-The system can use either:
-1. Real-time AWS pricing data (requires AWS credentials)
-2. Cached pricing data (included in aws_pricing_data/)
-
-To update pricing data:
-```bash
-python aws_price_downloader.py
-```
+### main.py
+- Main entry point for the application
+- Handles logging and error management
+- Orchestrates the cost estimation process
 
 ## Output Format
 
-The cost estimation results are saved in `cost_estimate_result.json` with the following structure:
-```json
-{
-  "architecture_name": "Example Architecture",
-  "cost_breakdown": {
-    "Service1": 10.50,
-    "Service2": 25.75,
-    "Total": 36.25
-  },
-  "service_details": {
-    "Service1": {
-      "configuration": {},
-      "monthly_cost": 10.50
-    }
-  },
-  "monthly_total_cost": 36.25,
-  "currency": "USD",
-  "timestamp": "2024-03-19T12:00:00",
-  "region": "us-east-1"
-}
+The cost estimator provides a detailed report including:
+- Service-specific details (instance types, specifications)
+- Hourly and monthly costs for fixed-cost services
+- Usage components for usage-based services
+- Total hourly and monthly costs
+
+Example output:
+```
+Cost Report for AWS Architecture
+Region: ap-south-1
+------------------------------------------------------------
+
+Services:
+----------------------------------------
+AmazonEC2:
+Instance Type: c6a.2xlarge
+Hourly Cost: $0.21970000
+Monthly Cost: $158.18
+[Specifications...]
+
+AmazonRDS:
+Instance Type: db.t3.micro
+Hourly Cost: $0.26200000
+Monthly Cost: $188.64
+[Specifications...]
+
+AmazonS3:
+Usage Type: Storage, requests, and data transfer
+[Usage Components...]
+Note: Cost depends on actual usage
+
+Summary:
+------------------------------------------------------------
+Total Hourly Cost: $0.48170000
+Total Monthly Cost: $346.82
 ```
 
 ## Contributing
 
-Feel free to contribute by:
-1. Adding support for more AWS services
-2. Improving cost calculation accuracy
-3. Enhancing the architecture parsing capabilities
-4. Adding more example architectures
+Contributions are welcome! Feel free to:
+1. Add support for more AWS services
+2. Improve cost calculation accuracy
+3. Enhance the reporting format
+4. Add more example architectures
 
 ## License
 

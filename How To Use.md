@@ -4,24 +4,24 @@
 1. [Introduction](#introduction)
 2. [Prerequisites](#prerequisites)
 3. [Installation](#installation)
-4. [Directory Structure](#directory-structure)
-5. [AWS Pricing Data](#aws-pricing-data)
+4. [Project Structure](#project-structure)
+5. [Configuration](#configuration)
 6. [Architecture Definition](#architecture-definition)
 7. [Running the Cost Estimator](#running-the-cost-estimator)
 8. [Understanding the Results](#understanding-the-results)
-9. [Supported AWS Services](#supported-aws-services)
+9. [Supported Services](#supported-services)
 10. [Troubleshooting](#troubleshooting)
 
 ## Introduction
 
-The AWS Cost Estimator is a Python-based tool that helps you estimate the monthly costs of your AWS infrastructure based on your architecture definition. It uses actual AWS pricing data to provide accurate cost estimates for various AWS services.
+The AWS Cost Estimator is a Python-based tool that helps you estimate costs for AWS architectures. It uses the AWS Pricing API to provide accurate cost estimates for various AWS services, including both fixed-cost and usage-based services.
 
 ## Prerequisites
 
 - Python 3.6 or higher
 - pip (Python package installer)
-- AWS Pricing API access (for downloading pricing data)
-- Basic understanding of AWS services and their pricing models
+- AWS credentials (Access Key and Secret Key)
+- Basic understanding of AWS services
 
 ## Installation
 
@@ -36,44 +36,32 @@ cd aws-cost-estimator
 pip install -r requirements.txt
 ```
 
-3. Create the necessary directories:
-```bash
-mkdir -p aws_pricing_data/ap-south-1
+3. Create a `.env` file with your AWS credentials:
+```
+AWS_ACCESS_KEY_ID=your_access_key
+AWS_SECRET_ACCESS_KEY=your_secret_key
+AWS_REGION=ap-south-1
 ```
 
-## Directory Structure
+## Project Structure
 
 ```
 aws-cost-estimator/
-├── main.py
-├── cost_estimator.py
-├── requirements.txt
-├── aws_pricing_data/
-│   └── ap-south-1/
-│       ├── AmazonEC2_pricing.json
-│       ├── AmazonRDS_pricing.json
-│       ├── AmazonS3_pricing.json
-│       └── ... (other pricing files)
-└── examples/
-    ├── ai_chatbot_architecture.json
-    └── multi_tier_architecture.json
+├── aws_pricing_api.py      # AWS Pricing API interaction
+├── cost_estimator.py       # Core cost estimation logic
+├── main.py                # Main entry point
+├── test_architecture.json  # Sample architecture
+├── requirements.txt        # Project dependencies
+├── .env                   # Environment configuration
+└── README.md              # Documentation
 ```
 
-## AWS Pricing Data
+## Configuration
 
-1. Download AWS pricing data files for your region:
-   - EC2 pricing
-   - RDS pricing
-   - S3 pricing
-   - Lambda pricing
-   - DynamoDB pricing
-   - Route53 pricing
-   - CloudFront pricing
-   - SNS pricing
-   - ElastiCache pricing
-   - AWS Config pricing
-
-2. Place the pricing files in the `aws_pricing_data/ap-south-1/` directory
+The tool uses environment variables for configuration. Create a `.env` file with:
+- AWS_ACCESS_KEY_ID: Your AWS access key
+- AWS_SECRET_ACCESS_KEY: Your AWS secret key
+- AWS_REGION: Your preferred AWS region (default: ap-south-1)
 
 ## Architecture Definition
 
@@ -83,152 +71,135 @@ Create a JSON file defining your AWS architecture. The file should follow this s
 {
   "nodes": [
     {
-      "id": "vpc-1",
-      "type": "AmazonVPC",
-      "label": "Virtual Private Cloud",
-      "group": "network"
+      "type": "AmazonEC2",
+      "instance_type": "c6a.2xlarge"
     },
     {
-      "id": "ec2-1",
-      "type": "AmazonEC2",
-      "label": "Application Server",
-      "InstanceType": "t3.medium",
-      "group": "compute"
-    }
-    // ... other nodes
-  ],
-  "edges": [
+      "type": "AmazonRDS",
+      "instance_type": "db.t3.micro"
+    },
     {
-      "from": "vpc-1",
-      "to": "ec2-1"
+      "type": "AmazonS3"
+    },
+    {
+      "type": "AWSLambda"
     }
-    // ... other connections
   ]
 }
 ```
 
-### Supported Node Types:
-- AmazonVPC
+### Supported Service Types:
 - AmazonEC2
 - AmazonRDS
 - AmazonS3
-- AmazonDynamoDB
 - AWSLambda
-- AmazonSNS
-- AmazonElastiCache
-- AmazonRoute53
-- AmazonCloudFront
-- AWSConfig
+- Other usage-based services
 
 ## Running the Cost Estimator
 
 1. Basic usage:
 ```bash
-python main.py examples/your_architecture.json
+python main.py
 ```
 
-2. Specify a different region:
-```bash
-python main.py examples/your_architecture.json --region us-east-1
-```
-
-3. Specify a different pricing data directory:
-```bash
-python main.py examples/your_architecture.json --pricing-dir /path/to/pricing/data
-```
+The script will:
+1. Load your architecture from test_architecture.json
+2. Calculate costs using the AWS Pricing API
+3. Display a detailed cost report
 
 ## Understanding the Results
 
-The tool will output:
-1. A detailed breakdown of costs for each service
-2. Total estimated monthly cost
-3. A JSON file (`cost_estimate_result.json`) with the complete results
+The tool provides a detailed cost report with:
+
+1. Fixed-Cost Services (e.g., EC2, RDS):
+   - Instance type
+   - Hourly cost
+   - Monthly cost
+   - Detailed specifications
+
+2. Usage-Based Services (e.g., S3, Lambda):
+   - Service type
+   - Usage components
+   - Pricing factors
+   - Note about usage-based pricing
 
 Example output:
 ```
-Cost Estimation Results:
-=======================
-Virtual Private Cloud: $0.00
-Application Server: $32.26
-Storage Bucket: $0.20
-Relational Database: $141.12
-NoSQL Database: $0.00
-Serverless Function: $0.00
-Notification Service: $0.00
-Caching Service: $30.96
-Configuration Management: $0.00
-Total: $204.54
+Cost Report for AWS Architecture
+Region: ap-south-1
+------------------------------------------------------------
+
+Services:
+----------------------------------------
+AmazonEC2:
+Instance Type: c6a.2xlarge
+Hourly Cost: $0.21970000
+Monthly Cost: $158.18
+[Specifications...]
+
+AmazonS3:
+Usage Type: Storage, requests, and data transfer
+Pricing Components:
+  - Storage (per GB per month)
+  - Data Transfer (per GB)
+  - Requests (per 1000 requests)
+Note: Cost depends on actual usage
+
+Summary:
+------------------------------------------------------------
+Total Hourly Cost: $0.48170000
+Total Monthly Cost: $346.82
 ```
 
-## Supported AWS Services
+## Supported Services
 
-### Compute Services
-- EC2: Supports all instance types
-- Lambda: Calculates based on memory, duration, and invocations
-- RDS: Supports all instance types
+### Fixed-Cost Services
+- EC2: All instance types
+- RDS: All instance types
 
-### Storage Services
-- S3: Calculates storage and request costs
-- DynamoDB: Calculates storage, read capacity, and write capacity costs
-
-### Network Services
-- VPC: Free (costs only for resources within)
-- Route53: Calculates hosted zone and query costs
-- CloudFront: Calculates data transfer and request costs
-
-### Database Services
-- RDS: Supports all instance types
-- DynamoDB: Supports provisioned capacity
-- ElastiCache: Supports all instance types
-
-### Other Services
-- SNS: Calculates notification costs
-- AWS Config: Calculates config item and rule evaluation costs
+### Usage-Based Services
+- S3: Storage, requests, data transfer
+- Lambda: Compute time, requests
+- DynamoDB: Storage, read/write capacity
+- SNS: Message delivery, data transfer
+- CloudWatch: Metrics, logs, alarms
+- API Gateway: API calls, data transfer
+- ElastiCache: Cache nodes, data transfer
 
 ## Troubleshooting
 
 ### Common Issues
 
-1. Missing Pricing Data
-   - Ensure all required pricing files are in the correct directory
-   - Check file permissions
-   - Verify file format is correct
+1. AWS Credentials
+   - Verify credentials in .env file
+   - Check AWS region setting
+   - Ensure AWS Pricing API access
 
 2. Invalid Architecture File
    - Check JSON syntax
-   - Verify all required fields are present
-   - Ensure service types are correct
+   - Verify service types
+   - Check instance type names
 
 3. Zero Costs
-   - Check if pricing data is loaded correctly
-   - Verify service configurations
-   - Check logs for warnings
-
-### Logging
-
-The tool provides detailed logging. To enable debug logging:
-```bash
-export PYTHONPATH=.
-python -m logging -l DEBUG main.py examples/your_architecture.json
-```
+   - Verify service configuration
+   - Check if service is usage-based
+   - Verify AWS Pricing API response
 
 ### Getting Help
 
 If you encounter issues:
-1. Check the logs for error messages
-2. Verify your pricing data files
-3. Review the architecture file format
-4. Check the supported services list
+1. Check error messages
+2. Verify AWS credentials
+3. Review architecture file format
+4. Check supported services list
 
 ## Best Practices
 
-1. Always use the latest pricing data
-2. Keep architecture files in version control
-3. Document assumptions in architecture files
+1. Use correct service types
+2. Specify instance types where applicable
+3. Document architecture assumptions
 4. Review cost estimates regularly
-5. Use appropriate instance types
-6. Consider reserved instances for long-term workloads
-7. Monitor actual costs vs. estimates
+5. Consider usage patterns for usage-based services
 
 ## Contributing
 

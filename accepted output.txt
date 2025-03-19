@@ -1,0 +1,162 @@
+⚡Vinsmoke ❯❯ python main.py examples/multi_tier_architecture.json
+INFO:botocore.credentials:Found credentials in environment variables.
+INFO:root:VPC cost calculation: VPC itself is free
+INFO:root:Route53 cost calculation: hosted_zone_cost=$0.50, queries_cost=$400.00
+INFO:root:CloudFront cost calculation: data_transfer_cost=$8.50, requests_cost=$0.01
+INFO:root:EC2 cost calculation: instance_type=t3.medium, monthly_cost=$32.26
+INFO:root:S3 cost calculation: storage_cost=$2.50, request_cost=$0.00
+INFO:root:RDS cost calculation: instance_type=db.t3.medium, monthly_cost=$141.12
+INFO:root:DynamoDB cost calculation: storage_cost=$0.00, rcu_cost=$0.00, wcu_cost=$0.00
+INFO:root:Lambda cost calculation: GB-seconds=500000.0, compute_cost=$0.00, request_cost=$0.00
+INFO:root:SNS cost calculation: notifications=100000.0, cost=$0.00
+INFO:root:ElastiCache cost calculation: instance_type=cache.t3.small, monthly_cost=$30.96
+INFO:root:AWS Config cost calculation: config_items_cost=$0.30, rule_evaluations_cost=$1.00
+
+Cost Estimation Results:
+=======================
+Virtual Private Cloud: $0.00
+DNS Management: $400.50
+CDN: $8.51
+Application Server: $32.26
+Storage Bucket: $2.50
+Relational Database: $141.12
+NoSQL Database: $0.00
+DNS Management: $400.50
+CDN: $8.51
+Application Server: $32.26
+Storage Bucket: $2.50
+Relational Database: $141.12
+NoSQL Database: $0.00
+CDN: $8.51
+Application Server: $32.26
+Storage Bucket: $2.50
+Relational Database: $141.12
+NoSQL Database: $0.00
+Application Server: $32.26
+Storage Bucket: $2.50
+Relational Database: $141.12
+NoSQL Database: $0.00
+Storage Bucket: $2.50
+Relational Database: $141.12
+NoSQL Database: $0.00
+Relational Database: $141.12
+NoSQL Database: $0.00
+NoSQL Database: $0.00
+Serverless Function: $0.00
+Serverless Function: $0.00
+Notification Service: $0.00
+Caching Service: $30.96
+Configuration Management: $1.30
+Caching Service: $30.96
+Configuration Management: $1.30
+Total: $617.15
+Configuration Management: $1.30
+Total: $617.15
+Total: $617.15
+
+Cost Estimation Results:
+=======================
+Virtual Private Cloud: $0.00
+DNS Management: $400.50
+CDN: $8.51
+Application Server: $32.26
+Storage Bucket: $2.50
+Relational Database: $141.12
+NoSQL Database: $0.00
+Serverless Function: $0.00
+Notification Service: $0.00
+Caching Service: $30.96
+Configuration Management: $1.30
+Total: $617.15
+
+
+
+
+
+
+⚡Vinsmoke ❯❯ python main.py examples/multi_tier_architecture.json
+INFO:botocore.credentials:Found credentials in environment variables.
+INFO:root:Cost report saved to cost_report.json
+
+Cost Estimation Summary:
+=======================
+Architecture: Multi_Tier_AWS_Architecture
+Region: ap-south-1
+Total Monthly Cost: $0.69
+Report Generated: 2025-03-19T17:14:16.805583
+
+Detailed Service Costs:
+======================
+
+EC2:
+  Monthly Cost: $0.04
+  Daily Cost: $0.00
+  Hourly Cost: $0.0001
+  Specifications:
+    vCPU: 2
+    memory: 4.0 GiB
+    network_bandwidth: Up to 5 Gigabit
+    storage: EBS only
+
+RDS:
+  Monthly Cost: $0.11
+  Daily Cost: $0.00
+  Hourly Cost: $0.0001
+  Specifications:
+    vCPU: 2
+    memory: 4.0 GiB
+    storage: 20 GB
+    engine: SQL Server
+
+S3:
+  Monthly Cost: $0.00
+  Daily Cost: $0.00
+  Hourly Cost: $0.0000
+  Specifications:
+    storage_price_per_gb: $0.0240
+    request_price_per_1000: $24.0000
+    storage_class: Standard
+
+ElastiCache:
+  Monthly Cost: $0.04
+  Daily Cost: $0.00
+  Hourly Cost: $0.0001
+  Specifications:
+    vCPU: 2
+    memory: 1.37 GiB
+    network_bandwidth: Up to 5 Gigabit
+    engine: Redis
+
+Route53:
+  Monthly Cost: $0.50
+  Daily Cost: $0.02
+  Hourly Cost: $0.0007
+  Specifications:
+    hosted_zone: $0.50 per zone
+    queries: $0.0002 per query
+
+CloudFront:
+  Monthly Cost: $0.00
+  Daily Cost: $0.00
+  Hourly Cost: $0.0000
+  Specifications:
+
+Lambda:
+  Monthly Cost: $0.00
+  Daily Cost: $0.00
+  Hourly Cost: $0.0000
+  Specifications:
+    memory: 128 MB to 10,240 MB
+    timeout: Up to 15 minutes
+    runtime: Multiple supported
+    compute_price: $0.000017 per GB-second
+
+SNS:
+  Monthly Cost: $0.00
+  Daily Cost: $0.00
+  Hourly Cost: $0.0000
+  Specifications:
+    message_price: $0.000000 per message
+    delivery_protocols: ['HTTP/HTTPS', 'Email', 'SMS', 'Mobile Push']
+    network_features: ['VPC Peering', 'Transit Gateway', 'Direct Connect']
+    security_features: ['Security Groups', 'Network ACLs', 'Flow Logs']

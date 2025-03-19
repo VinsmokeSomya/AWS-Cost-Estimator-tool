@@ -1,0 +1,41 @@
+{
+    "title": "Test AWS Architecture",
+    "nodes": [
+        {
+            "id": "ec2-1",
+            "type": "AmazonEC2",
+            "label": "Web Server",
+            "group": "Compute",
+            "Description": "c5.xlarge instance for web server",
+            "MonthlyCost": 0,
+            "CostBreakdown": {}
+        },
+        {
+            "id": "rds-1",
+            "type": "AmazonRDS",
+            "label": "Database",
+            "group": "Database",
+            "Description": "db.t3.micro instance for MySQL",
+            "MonthlyCost": 0,
+            "CostBreakdown": {}
+        },
+        {
+            "id": "s3-1",
+            "type": "AmazonS3",
+            "label": "Storage",
+            "group": "Storage",
+            "Description": "Standard storage for static content",
+            "MonthlyCost": 0,
+            "CostBreakdown": {}
+        },
+        {
+            "id": "lambda-1",
+            "type": "AWSLambda",
+            "label": "Serverless Function",
+            "group": "Compute",
+            "Description": "Serverless function for processing",
+            "MonthlyCost": 0,
+            "CostBreakdown": {}
+        }
+    ]
+} 

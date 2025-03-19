@@ -1,0 +1,209 @@
+{
+    "title": "Social_Media_Cloud_Architecture",
+    "nodes": [
+        {
+            "id": "webApp",
+            "type": "AmazonEC2",
+            "label": "Web Application",
+            "group": "Application Layer",
+            "Description": "An EC2 instance for hosting Express.js web application",
+            "InstanceType": "t2.micro",
+            "vpc": "",
+            "subnet": "",
+            "MonthlyCost": "",
+            "TimeForHosting": "24/7",
+            "CostBreakdown": {
+                "InstanceType": "",
+                "CostPerHour": "",
+                "HoursPerMonth": ""
+            }
+        },
+        {
+            "id": "db",
+            "type": "AmazonRDS",
+            "label": "MySQL Database",
+            "group": "Data Layer",
+            "vpc": "",
+            "subnet": "",
+            "DBEngine": "MySQL",
+            "DBInstanceClass": "db.t3.small",
+            "Storage": "20",
+            "BackupRetention": "7",
+            "MonthlyCost": "",
+            "TimeForHosting": "",
+            "CostBreakdown": {
+                "DBInstanceClass": "",
+                "StorageCost": "",
+                "BackupStorageCost": ""
+            }
+        },
+        {
+            "id": "apiGateway",
+            "type": "AmazonAPIGateway",
+            "label": "API Gateway",
+            "group": "Network Layer",
+            "MonthlyCost": "",
+            "CostPerMillionRequests": "",
+            "TimeForHosting": "",
+            "CostBreakdown": {
+                "CostPerRequest": ""
+            }
+        },
+        {
+            "id": "s3bucket",
+            "type": "AmazonS3",
+            "label": "S3 Bucket",
+            "group": "Storage Layer",
+            "BucketName": "social-media-bucket",
+            "AccessControl": "Private",
+            "Size": "100",
+            "RequestCount": "1000000",
+            "MonthlyCost": "",
+            "TimeForHosting": "",
+            "CostBreakdown": {
+                "StorageSize": "",
+                "CostPerGB": ""
+            }
+        },
+        {
+            "id": "autoScaling",
+            "type": "AutoScaling",
+            "label": "Auto Scaling Group",
+            "group": "Scaling Layer",
+            "Description": "Automatically adjust server capacity based on traffic",
+            "LaunchConfiguration": {
+                "InstanceType": "c5.xlarge",
+                "MinSize": "1",
+                "MaxSize": "3",
+                "DesiredCapacity": "2"
+            }
+        },
+        {
+            "id": "vpc",
+            "type": "AmazonVPC",
+            "label": "Virtual Private Cloud",
+            "group": "Network Layer",
+            "Description": "Isolated section of the AWS Cloud, logically separated from other virtual networks in the AWS Cloud"
+        },
+        {
+            "id": "lambda",
+            "type": "AWSLambda",
+            "label": "AWS Lambda",
+            "group": "Compute Layer",
+            "Description": "Run code without provisioning or managing servers",
+            "Runtime": "nodejs18.x",
+            "Memory": "256",
+            "Timeout": "30",
+            "MonthlyCost": "",
+            "CostBreakdown": {
+                "InvocationCost": "",
+                "ExecutionTimeCost": ""
+            }
+        },
+        {
+            "id": "dynamoDB",
+            "type": "AmazonDynamoDB",
+            "label": "DynamoDB",
+            "group": "Data Layer",
+            "Description": "Fully managed NoSQL database service",
+            "Throughput": "5",
+            "Storage": "10",
+            "MonthlyCost": "",
+            "CostBreakdown": {
+                "ProvisionedThroughputCost": "",
+                "StorageCost": ""
+            }
+        },
+        {
+            "id": "ebs",
+            "type": "AmazonEBS",
+            "label": "Amazon EBS",
+            "group": "Storage Layer",
+            "Description": "Block storage volume",
+            "VolumeCount": "2",
+            "MonthlyCost": "",
+            "CostBreakdown": {
+                "VolumeCost": ""
+            }
+        },
+        {
+            "id": "sns",
+            "type": "AmazonSNS",
+            "label": "Amazon SNS",
+            "group": "Application Layer",
+            "Description": "Fully managed pub/sub messaging service",
+            "TopicCount": "3",
+            "MonthlyCost": "",
+            "CostBreakdown": {
+                "TopicCost": ""
+            }
+        },
+        {
+            "id": "elasticLoadBalancer",
+            "type": "AWSELB",
+            "label": "Amazon Elastic Load Balancer",
+            "group": "Network Layer",
+            "Description": "Automatically distributes incoming application traffic across multiple targets",
+            "LoadBalancerType": "Application",
+            "MonthlyCost": "",
+            "CostBreakdown": {
+                "LoadBalancerCost": ""
+            }
+        },
+        {
+            "id": "efs",
+            "type": "AWSEFS",
+            "label": "Amazon EFS",
+            "group": "Storage Layer",
+            "Description": "Fully managed elastic file system",
+            "Size": "100",
+            "MonthlyCost": "",
+            "CostBreakdown": {
+                "StorageSizeCost": "",
+                "IOCost": ""
+            }
+        },
+        {
+            "id": "sqs",
+            "type": "AmazonSQS",
+            "label": "Amazon SQS",
+            "group": "Application Layer",
+            "Description": "Fully managed message queuing service",
+            "QueueCount": "2",
+            "MonthlyCost": "",
+            "CostBreakdown": {
+                "QueueCost": ""
+            }
+        },
+        {
+            "id": "iamAnalyzer",
+            "type": "AWSIAMAccessAnalyzer",
+            "label": "AWS IAM Access Analyzer",
+            "group": "Security Layer",
+            "Description": "Analyze resource policies to help administrators and security teams identify resources that can be accessed from outside an AWS account",
+            "AnalyzerCount": "1",
+            "MonthlyCost": "",
+            "CostBreakdown": {
+                "AnalyzerCost": ""
+            }
+        }
+    ],
+    "edges": [
+        {
+            "from": "webApp",
+            "to": "db"
+        },
+        {
+            "from": "apiGateway",
+            "to": "webApp"
+        },
+        {
+            "from": "webApp",
+            "to": "s3bucket"
+        },
+        {
+            "from": "webApp",
+            "to": "dynamoDB"
+        }
+    ]
+} 
