@@ -1,0 +1,14 @@
+{
+  "Virtual Private Cloud": 0.0,
+  "DNS Management": 0.0,
+  "CDN": 0.0,
+  "Application Server": 32.256,
+  "Storage Bucket": 0.20027,
+  "Relational Database": 141.12,
+  "NoSQL Database": 0.0,
+  "Serverless Function": 6e-08,
+  "Notification Service": 5e-08,
+  "Caching Service": 30.96,
+  "Configuration Management": 0.0,
+  "Total": 204.53627011000003
+}

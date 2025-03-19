@@ -1,0 +1,87 @@
+{
+  "title": "Data Analytics Pipeline Architecture",
+  "description": "A scalable data analytics pipeline for processing and analyzing large datasets",
+  "nodes": [
+    {
+      "id": "data_ingestion",
+      "type": "Lambda",
+      "label": "Data Ingestion Function",
+      "Memory": 1024,
+      "CostBreakdown": {
+        "InvocationCost": 500000,
+        "ExecutionTimeCost": 2000
+      },
+      "Description": "Ingests data from various sources and triggers processing"
+    },
+    {
+      "id": "raw_data_bucket",
+      "type": "S3",
+      "label": "Raw Data Storage",
+      "Size": 1000,
+      "RequestCount": 50000,
+      "Description": "Stores raw incoming data files"
+    },
+    {
+      "id": "processed_data_bucket",
+      "type": "S3",
+      "label": "Processed Data Storage",
+      "Size": 500,
+      "RequestCount": 100000,
+      "Description": "Stores processed and transformed data"
+    },
+    {
+      "id": "data_processing",
+      "type": "EMR",
+      "label": "Data Processing Cluster",
+      "instance_type": "m5.xlarge",
+      "node_count": 3,
+      "hours_per_month": 360,
+      "Description": "Processes and transforms raw data using Spark"
+    },
+    {
+      "id": "metadata_store",
+      "type": "DynamoDB",
+      "label": "Metadata Store",
+      "Storage": 50,
+      "Throughput": 100,
+      "Description": "Stores metadata about processed datasets"
+    },
+    {
+      "id": "analysis_results",
+      "type": "RDS",
+      "label": "Analysis Results DB",
+      "instance_type": "db.r5.large",
+      "storage_gb": 200,
+      "hours_per_month": 730,
+      "Description": "Stores analyzed data and results"
+    },
+    {
+      "id": "pipeline_monitor",
+      "type": "Lambda",
+      "label": "Pipeline Monitor",
+      "Memory": 512,
+      "CostBreakdown": {
+        "InvocationCost": 100000,
+        "ExecutionTimeCost": 500
+      },
+      "Description": "Monitors pipeline health and sends notifications"
+    },
+    {
+      "id": "notifications",
+      "type": "SNS",
+      "label": "Pipeline Notifications",
+      "CostBreakdown": {
+        "TopicCost": 50000
+      },
+      "Description": "Sends notifications about pipeline status and completion"
+    }
+  ],
+  "edges": [
+    {"from": "data_ingestion", "to": "raw_data_bucket"},
+    {"from": "raw_data_bucket", "to": "data_processing"},
+    {"from": "data_processing", "to": "processed_data_bucket"},
+    {"from": "data_processing", "to": "metadata_store"},
+    {"from": "processed_data_bucket", "to": "analysis_results"},
+    {"from": "pipeline_monitor", "to": "notifications"}
+  ]
+} 

@@ -1,0 +1,104 @@
+{
+    "title": "AI_Chatbot_Cloud_Architecture",
+    "nodes": [
+        {
+            "id": "chatbotApp",
+            "type": "AWSLambda",
+            "label": "Chatbot Processing",
+            "group": "Compute Layer",
+            "Description": "Lambda function processing chatbot requests using an AI model",
+            "Runtime": "python3.9",
+            "Memory": "1024",
+            "Timeout": "30",
+            "MonthlyCost": "",
+            "CostBreakdown": {
+                "InvocationCost": "1000000",
+                "ExecutionTimeCost": "1000"
+            }
+        },
+        {
+            "id": "db",
+            "type": "AmazonDynamoDB",
+            "label": "User Conversation Database",
+            "group": "Data Layer",
+            "Description": "Stores chatbot conversations and user preferences",
+            "Throughput": "25",
+            "Storage": "100",
+            "MonthlyCost": "",
+            "CostBreakdown": {
+                "ProvisionedThroughputCost": "25",
+                "StorageCost": "100"
+            }
+        },
+        {
+            "id": "apiGateway",
+            "type": "AmazonAPIGateway",
+            "label": "API Gateway",
+            "group": "Network Layer",
+            "MonthlyCost": "",
+            "CostPerMillionRequests": "1",
+            "TimeForHosting": "24/7",
+            "CostBreakdown": {
+                "CostPerRequest": "1000000"
+            }
+        },
+        {
+            "id": "s3bucket",
+            "type": "AmazonS3",
+            "label": "Chatbot Model Storage",
+            "group": "Storage Layer",
+            "BucketName": "ai-chatbot-models",
+            "AccessControl": "Private",
+            "Size": "50",
+            "RequestCount": "100000",
+            "MonthlyCost": "",
+            "TimeForHosting": "24/7",
+            "CostBreakdown": {
+                "StorageSize": "50",
+                "CostPerGB": "0.023"
+            }
+        },
+        {
+            "id": "sns",
+            "type": "AmazonSNS",
+            "label": "User Notification Service",
+            "group": "Application Layer",
+            "Description": "Sends chatbot notifications to users via SMS or email",
+            "TopicCount": "5",
+            "MonthlyCost": "",
+            "CostBreakdown": {
+                "TopicCost": "100000"
+            }
+        },
+        {
+            "id": "iamAnalyzer",
+            "type": "AWSIAMAccessAnalyzer",
+            "label": "AWS IAM Access Analyzer",
+            "group": "Security Layer",
+            "Description": "Ensures chatbot security and access control policies",
+            "AnalyzerCount": "1",
+            "MonthlyCost": "",
+            "CostBreakdown": {
+                "AnalyzerCost": "1"
+            }
+        }
+    ],
+    "edges": [
+        {
+            "from": "chatbotApp",
+            "to": "db"
+        },
+        {
+            "from": "chatbotApp",
+            "to": "s3bucket"
+        },
+        {
+            "from": "apiGateway",
+            "to": "chatbotApp"
+        },
+        {
+            "from": "chatbotApp",
+            "to": "sns"
+        }
+    ]
+} 

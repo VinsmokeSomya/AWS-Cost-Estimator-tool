@@ -1,0 +1,104 @@
+{
+  "title": "Serverless Web Application",
+  "description": "A modern serverless web application with static hosting and dynamic API backend",
+  "nodes": [
+    {
+      "id": "static_hosting",
+      "type": "S3",
+      "label": "Website Hosting",
+      "Size": 10,
+      "RequestCount": 1000000,
+      "Description": "Hosts static website content"
+    },
+    {
+      "id": "cdn",
+      "type": "CloudFront",
+      "label": "Content CDN",
+      "CostBreakdown": {
+        "DataTransferGB": 500,
+        "RequestCount": 1000000
+      },
+      "Description": "CDN for static content delivery"
+    },
+    {
+      "id": "api_endpoint",
+      "type": "APIGateway",
+      "label": "API Endpoint",
+      "CostBreakdown": {
+        "CostPerRequest": 1500000
+      },
+      "Description": "REST API endpoint for dynamic content"
+    },
+    {
+      "id": "auth_function",
+      "type": "Lambda",
+      "label": "Authentication",
+      "Memory": 256,
+      "CostBreakdown": {
+        "InvocationCost": 200000,
+        "ExecutionTimeCost": 300
+      },
+      "Description": "Handles user authentication"
+    },
+    {
+      "id": "data_function",
+      "type": "Lambda",
+      "label": "Data Handler",
+      "Memory": 512,
+      "CostBreakdown": {
+        "InvocationCost": 300000,
+        "ExecutionTimeCost": 600
+      },
+      "Description": "Processes data requests"
+    },
+    {
+      "id": "user_data",
+      "type": "DynamoDB",
+      "label": "User Data Store",
+      "Storage": 20,
+      "Throughput": 50,
+      "Description": "Stores user data and preferences"
+    },
+    {
+      "id": "app_data",
+      "type": "DynamoDB",
+      "label": "Application Data",
+      "Storage": 50,
+      "Throughput": 100,
+      "Description": "Stores application data"
+    },
+    {
+      "id": "media_storage",
+      "type": "S3",
+      "label": "Media Storage",
+      "Size": 100,
+      "RequestCount": 500000,
+      "Description": "Stores user-uploaded media"
+    },
+    {
+      "id": "notifications",
+      "type": "SNS",
+      "label": "Notifications",
+      "CostBreakdown": {
+        "TopicCost": 100000
+      },
+      "Description": "Handles user notifications"
+    },
+    {
+      "id": "security_analyzer",
+      "type": "IAM",
+      "label": "Security Analyzer",
+      "AnalyzerCount": 1,
+      "Description": "Analyzes security policies and access patterns"
+    }
+  ],
+  "edges": [
+    {"from": "cdn", "to": "static_hosting"},
+    {"from": "api_endpoint", "to": "auth_function"},
+    {"from": "api_endpoint", "to": "data_function"},
+    {"from": "auth_function", "to": "user_data"},
+    {"from": "data_function", "to": "app_data"},
+    {"from": "data_function", "to": "media_storage"},
+    {"from": "data_function", "to": "notifications"}
+  ]
+} 
